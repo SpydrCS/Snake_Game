@@ -45,6 +45,9 @@ def generate_apple_locations():
         if x < 100 and y < 50:
             continue
 
+        if x + APPLE_WIDTH > 420 and x < 470 and y + APPLE_HEIGHT > 240 and y < 270:
+            continue
+
         apple = pygame.Rect(x, y, APPLE_WIDTH, APPLE_HEIGHT)
         for others in apple_list:
             if apple.colliderect(others):
