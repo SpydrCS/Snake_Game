@@ -5,6 +5,8 @@ WIDTH, HEIGHT = 900, 500
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Snake Game")
 
+SNAKE_PART_SIZE = 10
+
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -18,7 +20,33 @@ GREY = (131, 139, 139)
 FPS = 60
 SNAKE_SPEED = 10
 
-def draw_window(last_snake, dir):
+def snake_set_movement(last_snake, keys_pressed, direction):
+    new_snake = []
+    head_part = last_snake[0]
+
+    if keys_pressed[pygame.K_LEFT] and dir != "R":
+        new_snake.append(pygame.Rect(head_part.x - SNAKE_PART_SIZE, head_part.y, head_part.width, head_part.height))
+        for i in range(len(last_snake)-1):
+            new_snake.append(last_snake[i])
+    if keys_pressed[pygame.K_RIGHT] and dir != "L":
+        new_snake.append(pygame.Rect(head_part.x + SNAKE_PART_SIZE, head_part.y, head_part.width, head_part.height))
+        for i in range(len(last_snake)-1):
+            new_snake.append(last_snake[i])
+    if keys_pressed[pygame.K_DOWN] and dir != "U":
+        new_snake.append(pygame.Rect(head_part.x, head_part.y + SNAKE_PART_SIZE, head_part.width, head_part.height))
+        for i in range(len(last_snake)-1):
+            new_snake.append(last_snake[i])
+    if keys_pressed[pygame.K_UP] and dir != "D":
+        new_snake.append(pygame.Rect(head_part.x, head_part.y - SNAKE_PART_SIZE, head_part.width, head_part.height))
+        for i in range(len(last_snake)-1):
+            new_snake.append(last_snake[i])
+
+    tail_part = last_snake[len(last_snake)-1]
+    pygame.draw.rect(WIN, GRASS_GREEN, tail_part)
+    last_snake = new_snake
+
+
+def draw_window(last_snake):
     WIN.fill(GRASS_GREEN)
 
     border_left = pygame.Rect(0, 0, 15, HEIGHT)
@@ -30,30 +58,6 @@ def draw_window(last_snake, dir):
     pygame.draw.rect(WIN, GREY, border_right)
     pygame.draw.rect(WIN, GREY, border_top)
     pygame.draw.rect(WIN, GREY, border_bottom)
-
-    new_snake = []
-    head_part = last_snake[0]
-
-    if dir == "L":
-        new_snake.append(pygame.Rect(head_part.x - SNAKE_SPEED, head_part.y, head_part.width, head_part.height))
-        for i in range(len(last_snake)-1):
-            new_snake.append(last_snake[i])
-    if dir == "R":
-        new_snake.append(pygame.Rect(head_part.x + SNAKE_SPEED, head_part.y, head_part.width, head_part.height))
-        for i in range(len(last_snake)-1):
-            new_snake.append(last_snake[i])
-    if dir == "U":
-        new_snake.append(pygame.Rect(head_part.x, head_part.y - SNAKE_SPEED, head_part.width, head_part.height))
-        for i in range(len(last_snake)-1):
-            new_snake.append(last_snake[i])
-    if dir == "D":
-        new_snake.append(pygame.Rect(head_part.x, head_part.y + SNAKE_SPEED, head_part.width, head_part.height))
-        for i in range(len(last_snake)-1):
-            new_snake.append(last_snake[i])
-
-    tail_part = last_snake[len(last_snake)-1]
-    pygame.draw.rect(WIN, GRASS_GREEN, tail_part)
-    last_snake = new_snake
 
     for part in last_snake:
         pygame.draw.rect(WIN, ORANGE, part)
@@ -80,17 +84,12 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT and direction != "R":
-                    direction = "L"
-                if event.key == pygame.K_RIGHT and direction != "L":
-                    direction = "R"
-                if event.key == pygame.K_UP and direction != "D":
-                    direction = "U"
-                if event.key == pygame.K_DOWN and direction != "U":
-                    direction = "D"
+            
+        keys_pressed = pygame.key.get_pressed()
 
-        draw_window(last_snake, direction)
+        snake_set_movement(last_snake, keys_pressed, direction)
+
+        draw_window(last_snake)
 
     pygame.quit()
 
